@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mandalas del Bosque</title>
+<meta name="description" content="Cabañas y refugios en el bosque: disponibilidad, galería y contacto.">
+<meta name="theme-color" content="#16352a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mandalas">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/favicon-48.png" sizes="48x48">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon-180.png">
+<style>
+  :root{
+    --verde-prof:#16352a; --verde-bosque:#2d5a3f;
+    --dorado:#c9a227; --dorado-claro:#e6c34a;
+    --crema:#f7f3ea; --texto-suave:#5f6656;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--crema);overscroll-behavior:none}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;color:var(--verde-prof)}
+
+  #app{
+    position:fixed;inset:0;width:100%;height:100%;
+    border:0;background:var(--crema);display:block;
+  }
+
+  /* ---------- SPLASH ---------- */
+  #splash{
+    position:fixed;inset:0;z-index:10;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    background:linear-gradient(160deg,var(--verde-prof),var(--verde-bosque));
+    color:#fff;text-align:center;padding:32px 24px;
+    transition:opacity .45s ease,visibility .45s ease;
+  }
+  #splash.hide{opacity:0;visibility:hidden}
+  #splash .mark{width:96px;height:96px;border-radius:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+  #splash h1{font-family:Georgia,'Times New Roman',serif;font-weight:400;font-size:1.7rem;letter-spacing:1px}
+  #splash h1 em{display:block;color:var(--dorado-claro);font-size:.8em;margin-top:4px}
+  #splash .spinner{
+    width:30px;height:30px;border:3px solid rgba(255,255,255,.25);
+    border-top-color:var(--dorado-claro);border-radius:50%;
+    animation:spin .9s linear infinite;margin-top:6px;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  #splash small{color:rgba(255,255,255,.65);font-size:.78rem;letter-spacing:1px}
+
+  /* ---------- BOTONES DE INSTALACIÓN ---------- */
+  .install-btn{
+    border:0;cursor:pointer;font-family:inherit;font-weight:600;
+    letter-spacing:1.2px;text-transform:uppercase;font-size:.78rem;
+    background:var(--dorado);color:var(--verde-prof);
+    padding:14px 28px;border-radius:50px;
+    box-shadow:0 12px 30px rgba(201,162,39,.35);
+    transition:transform .25s,background .25s;
+    touch-action:manipulation;
+  }
+  .install-btn:hover{background:var(--dorado-claro);transform:translateY(-2px)}
+  .install-btn.hidden{display:none}
+
+  #installPill{
+    position:fixed;z-index:20;
+    bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
+    display:flex;align-items:center;gap:8px;white-space:nowrap;
+    background:rgba(22,53,42,.96);color:#fff;
+    border-radius:50px;padding:8px 8px 8px 18px;
+    box-shadow:0 12px 34px rgba(0,0,0,.35);
+    font-size:.82rem;letter-spacing:.4px;max-width:calc(100vw - 24px);
+    animation:slideDown .4s ease;
+  }
+  #installPill.hidden{display:none}
+  #installPill button{
+    border:0;border-radius:50px;padding:9px 16px;cursor:pointer;
+    font-family:inherit;font-weight:600;font-size:.75rem;letter-spacing:1px;
+    text-transform:uppercase;background:var(--dorado);color:var(--verde-prof);
+    touch-action:manipulation;
+  }
+  #installPill .x{
+    background:transparent;color:rgba(255,255,255,.7);padding:6px 10px;
+    font-size:1rem;letter-spacing:0;
+  }
+  #installPill span{overflow:hidden;text-overflow:ellipsis}
+  @keyframes slideDown{from{transform:translate(-50%,140%)}to{transform:translate(-50%,0)}}
+
+  /* ---------- AVISOS ---------- */
+  .banner{
+    position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));
+    transform:translateX(-50%);z-index:30;
+    background:var(--verde-prof);color:#fff;border-radius:14px;
+    padding:14px 20px;font-size:.85rem;line-height:1.4;text-align:center;
+    box-shadow:0 16px 40px rgba(0,0,0,.35);max-width:calc(100vw - 24px);
+  }
+  .banner.hidden{display:none}
+  .banner button{
+    display:block;margin:10px auto 0;background:var(--dorado);color:var(--verde-prof);
+    border:0;border-radius:50px;padding:9px 20px;font-family:inherit;font-weight:600;
+    font-size:.78rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  }
+
+  /* ---------- CONFIGURACIÓN MANUAL DE URL ---------- */
+  #setup{
+    position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+    padding:24px;background:linear-gradient(160deg,var(--verde-prof),var(--verde-bosque));
+  }
+  #setup.hidden{display:none}
+  #setup .card{
+    background:var(--crema);border-radius:20px;padding:32px 24px;max-width:460px;width:100%;
+    box-shadow:0 30px 70px rgba(0,0,0,.4);
+  }
+  #setup h2{font-family:Georgia,serif;font-weight:400;font-size:1.35rem;margin-bottom:8px}
+  #setup p{color:var(--texto-suave);font-size:.88rem;line-height:1.6;margin-bottom:18px}
+  #setup input{
+    width:100%;padding:13px 14px;border:2px solid #e3dcca;border-radius:12px;
+    font-family:inherit;font-size:1rem;background:#fff;
+  }
+  #setup input:focus{outline:none;border-color:var(--dorado)}
+  #setup button{
+    width:100%;margin-top:14px;border:0;border-radius:50px;padding:14px;
+    background:var(--verde-prof);color:#fff;font-family:inherit;font-weight:600;
+    letter-spacing:1px;text-transform:uppercase;font-size:.8rem;cursor:pointer;
+  }
+</style>
+</head>
+<body>
+
+<iframe id="app" title="Mandalas del Bosque" allow="clipboard-write; fullscreen; geolocation"></iframe>
+
+<div id="splash">
+  <img class="mark" src="./icons/icon-192.png" alt="Mandalas del Bosque">
+  <h1>Mandalas <em>del Bosque</em></h1>
+  <div class="spinner"></div>
+  <small>CARGANDO…</small>
+  <button id="installSplash" class="install-btn hidden">Instalar app</button>
+</div>
+
+<div id="installPill" class="hidden">
+  <span>Instalá la app</span>
+  <button id="installPillBtn">Instalar</button>
+  <button class="x" id="installPillClose" aria-label="Cerrar">✕</button>
+</div>
+
+<div id="offline" class="banner hidden">
+  Sin conexión a internet. Revisá tus datos y volvé a intentar.
+  <button id="retry">Reintentar</button>
+</div>
+
+<div id="setup" class="hidden">
+  <div class="card">
+    <h2>Configurar la app</h2>
+    <p>Pegá la URL de la aplicación web de Apps Script (termina en <b>/exec</b>).</p>
+    <input id="setupUrl" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec">
+    <button id="setupSave">Guardar</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   CONFIGURACIÓN
+   Si cambiás la implementación de Apps Script, actualizá esta
+   URL (o abrí el sitio con ?setup=1 una sola vez).
+   ========================================================= */
+const DEFAULT_APP_URL =
+  'https://script.google.com/macros/s/AKfycbwvd8BSaz1QfcCYidpDXeYpIVB4v-yGN3cPFrf2swWX7XHsZIbtZgxUUUYMSMp6Sv1d/exec';
+
+const STORAGE_KEY = 'mdb.appUrl';
+const params = new URLSearchParams(location.search);
+const forcedSetup = params.get('setup') === '1';
+
+const frames = {
+  app: document.getElementById('app'),
+  splash: document.getElementById('splash'),
+  offline: document.getElementById('offline'),
+  setup: document.getElementById('setup'),
+  pill: document.getElementById('installPill')
+};
+
+const appUrl = (params.get('app') || localStorage.getItem(STORAGE_KEY) || DEFAULT_APP_URL || '').trim();
+const isValid = /^https:\/\/\S+$/.test(appUrl) && !forcedSetup;
+
+let splashHidden = false;
+let loadedOnce = false;
+
+/* =========================================================
+   ARRANQUE
+   ========================================================= */
+function hideSplash(){
+  if (splashHidden) return;
+  splashHidden = true;
+  frames.splash.classList.add('hide');
+  setTimeout(() => { frames.splash.style.display = 'none'; }, 500);
+}
+
+function showSetup(prefill){
+  frames.setup.classList.remove('hidden');
+  hideSplash();
+  const input = document.getElementById('setupUrl');
+  input.value = prefill || '';
+  input.focus();
+}
+
+document.getElementById('setupSave').onclick = () => {
+  const val = document.getElementById('setupUrl').value.trim();
+  if (!/^https:\/\/\S+$/.test(val)) {
+    alert('Ingresá una URL válida que empiece con https://');
+    return;
+  }
+  localStorage.setItem(STORAGE_KEY, val);
+  location.href = location.pathname;
+};
+
+if (!isValid || forcedSetup){
+  showSetup(appUrl === DEFAULT_APP_URL ? '' : appUrl);
+} else {
+  frames.app.src = appUrl;
+  const minSplash = setTimeout(hideSplash, 2600);
+  frames.app.addEventListener('load', () => {
+    loadedOnce = true;
+    clearTimeout(minSplash);
+    setTimeout(hideSplash, 350);
+  });
+  setTimeout(() => {
+    if (!loadedOnce && navigator.onLine === false) hideSplash();
+  }, 6000);
+}
+
+/* =========================================================
+   SIN CONEXIÓN
+   ========================================================= */
+function updateOnline(){
+  frames.offline.classList.toggle('hidden', navigator.onLine !== false);
+}
+window.addEventListener('online', () => { updateOnline(); if (isValid && !loadedOnce) frames.app.src = appUrl; });
+window.addEventListener('offline', updateOnline);
+updateOnline();
+
+document.getElementById('retry').onclick = () => {
+  if (isValid) frames.app.src = appUrl + (appUrl.includes('?') ? '&' : '?') + 'r=' + Date.now();
+};
+
+/* =========================================================
+   INSTALACIÓN (Android / Brave / Chrome / Edge)
+   ========================================================= */
+const isStandalone =
+  matchMedia('(display-mode: standalone)').matches ||
+  matchMedia('(display-mode: fullscreen)').matches ||
+  window.navigator.standalone === true;
+
+const iOS = /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+const dismissedAt = Number(localStorage.getItem('mdb.installDismissed') || 0);
+const dismissed = Date.now() - dismissedAt < 14 * 24 * 60 * 60 * 1000;
+let deferredPrompt = null;
+let pillTimer = null;
+
+const splashBtn = document.getElementById('installSplash');
+const pillBtn = document.getElementById('installPillBtn');
+
+function showInstallUI(){
+  if (isStandalone || dismissed) return;
+  if (!splashHidden && !frames.splash.classList.contains('hide')){
+    splashBtn.classList.remove('hidden');
+  } else {
+    frames.pill.classList.remove('hidden');
+    clearTimeout(pillTimer);
+    pillTimer = setTimeout(hideInstallUI, 15000);
+  }
+}
+
+function hideInstallUI(){
+  frames.pill.classList.add('hidden');
+  splashBtn.classList.add('hidden');
+}
+
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallUI();
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredPrompt = null;
+  hideInstallUI();
+  localStorage.setItem('mdb.installDismissed', String(Date.now()));
+});
+
+async function promptInstall(){
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  try { await deferredPrompt.userChoice; } catch (e) {}
+  deferredPrompt = null;
+  hideInstallUI();
+}
+
+splashBtn.onclick = promptInstall;
+pillBtn.onclick = promptInstall;
+document.getElementById('installPillClose').onclick = () => {
+  hideInstallUI();
+  localStorage.setItem('mdb.installDismissed', String(Date.now()));
+};
+
+/* iOS no expone beforeinstallprompt: damos la instrucción manual */
+if (iOS && !isStandalone && !dismissed){
+  setTimeout(() => {
+    if (deferredPrompt) return;
+    frames.pill.innerHTML =
+      '<span>Para instalar: <b>Compartir</b> → <b>Añadir a pantalla de inicio</b></span>' +
+      '<button class="x" id="iosClose" aria-label="Cerrar">✕</button>';
+    frames.pill.classList.remove('hidden');
+    document.getElementById('iosClose').onclick = () => {
+      frames.pill.classList.add('hidden');
+      localStorage.setItem('mdb.installDismissed', String(Date.now()));
+    };
+  }, 3200);
+}
+
+/* =========================================================
+   SERVICE WORKER (requisito de instalación)
+   ========================================================= */
+if ('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
