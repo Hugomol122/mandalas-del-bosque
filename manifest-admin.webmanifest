@@ -1,0 +1,35 @@
+{
+  "name": "Mandalas del Bosque · Admin",
+  "short_name": "Mandalas Admin",
+  "description": "Acceso privado al panel de administración de Mandalas del Bosque: cabañas, disponibilidad, galería y configuración.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "./?admin=1",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#16352a",
+  "theme_color": "#16352a",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

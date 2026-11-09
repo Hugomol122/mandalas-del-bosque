@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Mandalas">
-<link rel="manifest" href="./manifest.webmanifest">
+<link rel="manifest" href="./manifest.webmanifest" id="manifestLink">
 <link rel="icon" href="./icons/favicon-48.png" sizes="48x48">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon-180.png">
 <style>
@@ -177,8 +177,25 @@ const frames = {
   pill: document.getElementById('installPill')
 };
 
-const appUrl = (params.get('app') || localStorage.getItem(STORAGE_KEY) || DEFAULT_APP_URL || '').trim();
+/* Modo administrador: se abre con ?admin=1 y se instala como app aparte
+   (manifest-admin.webmanifest). El enlace se comparte solo con el admin. */
+const isAdminMode = params.get('admin') === '1';
+
+function withAdminParam(url){
+  if (!url) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'admin=1';
+}
+
+const configuredUrl = (params.get('app') || localStorage.getItem(STORAGE_KEY) || DEFAULT_APP_URL || '').trim();
+const appUrl = isAdminMode ? withAdminParam(configuredUrl) : configuredUrl;
 const isValid = /^https:\/\/\S+$/.test(appUrl) && !forcedSetup;
+
+if (isAdminMode){
+  document.getElementById('manifestLink').href = './manifest-admin.webmanifest';
+  document.title = 'Mandalas · Admin';
+  document.documentElement.classList.add('admin-mode');
+  document.querySelector('#splash h1').innerHTML = 'Mandalas <em>Admin</em>';
+}
 
 let splashHidden = false;
 let loadedOnce = false;
@@ -212,7 +229,7 @@ document.getElementById('setupSave').onclick = () => {
 };
 
 if (!isValid || forcedSetup){
-  showSetup(appUrl === DEFAULT_APP_URL ? '' : appUrl);
+  showSetup(configuredUrl === DEFAULT_APP_URL ? '' : configuredUrl);
 } else {
   frames.app.src = appUrl;
   const minSplash = setTimeout(hideSplash, 2600);

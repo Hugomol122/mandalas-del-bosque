@@ -1,9 +1,10 @@
-const CACHE = 'mandalas-shell-v1';
+const CACHE = 'mandalas-shell-v2';
 
 const ASSETS = [
   './',
   './index.html',
   './manifest.webmanifest',
+  './manifest-admin.webmanifest',
   './offline.html',
   './icons/icon-192.png',
   './icons/icon-512.png',
