@@ -178,8 +178,11 @@ const frames = {
 };
 
 /* Modo administrador: se abre con ?admin=1 y se instala como app aparte
-   (manifest-admin.webmanifest). El enlace se comparte solo con el admin. */
-const isAdminMode = params.get('admin') === '1';
+   (manifest-admin.webmanifest). El enlace se comparte solo con el admin.
+   Acepta también ?admin, ?admin= y ?admin=true (un enlace mal copiado
+   dejaba la app sin el engranaje de acceso al panel). */
+const adminParam = (params.get('admin') || '').toLowerCase();
+const isAdminMode = params.has('admin') && adminParam !== '0' && adminParam !== 'false';
 
 function withAdminParam(url){
   if (!url) return url;
